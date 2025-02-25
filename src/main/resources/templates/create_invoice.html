@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Create Invoice</title>
+    <link rel="stylesheet" th:href="@{/css/invoicesTable.css}">
+    <script>
+        function addItem() {
+            const itemSelect = document.getElementById("itemSelect");
+            const quantityInput = document.getElementById("quantityInput");
+            const selectedItemsContainer = document.getElementById("selectedItems");
+
+            if (!itemSelect.value || quantityInput.value <= 0) {
+                alert("Please select a valid item and quantity.");
+                return;
+            }
+
+            const itemId = itemSelect.value;
+            const itemName = itemSelect.options[itemSelect.selectedIndex].text;
+            const quantity = quantityInput.value;
+
+            // Create hidden input fields for form submission
+            const itemInput = `<input type="hidden" name="itemIds" value="${itemId}">`;
+            const quantityInputField = `<input type="hidden" name="quantities" value="${quantity}">`;
+
+            selectedItemsContainer.innerHTML += `
+                <div>
+                    ${itemName} (Quantity: ${quantity})
+                    ${itemInput} ${quantityInputField}
+                    <button type="button" onclick="this.parentElement.remove()">Remove</button>
+                </div>
+            `;
+
+            quantityInput.value = "";
+        }
+    </script>
+</head>
+<body>
+    <div class="dashboard-container">
+        <h2>Create a New Invoice</h2>
+
+        <form th:action="@{/invoices/create}" method="post">
+            <label>Select Item:</label>
+            <select id="itemSelect">
+                <option th:each="item : ${items}" th:value="${item.id}" th:text="${item.name}"></option>
+            </select>
+
+            <label>Quantity:</label>
+            <input type="number" id="quantityInput" min="1">
+
+            <button type="button" onclick="addItem()">Add Item</button>
+
+            <h3>Selected Items:</h3>
+            <div id="selectedItems"></div>
+
+            <br>
+            <button type="submit">Submit Invoice</button>
+        </form>
+    </div>
+</body>
+</html>

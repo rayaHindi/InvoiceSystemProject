@@ -1,0 +1,99 @@
+/* General Styles */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+}
+
+/* Dashboard Container */
+.dashboard-container {
+    width: 70%;
+    margin: 50px auto;
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    border-top: 5px solid rgb(165, 0, 95); /* Accent color */
+}
+
+/* Titles and Text */
+h2 {
+    color: rgb(128, 0, 64);
+}
+p {
+    color: #444;
+    font-size: 16px;
+}
+
+/* Table Styling */
+.table-container {
+    width: 100%;
+    overflow-x: auto;
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+th, td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: left;
+}
+th {
+    background-color: rgb(128, 0, 64);
+    color: white;
+}
+
+/* Pagination */
+.pagination {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+.pagination a {
+    text-decoration: none;
+    padding: 5px 5px;
+    background-color: rgb(128, 0, 64);
+    color: white;
+    border-radius: 5px;
+    transition: 0.3s;
+}
+.pagination a:hover {
+    background-color: rgb(165, 0, 95);
+}
+.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+/* Logout Button */
+.logout-container {
+    margin-top: 20px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+.logout-form {
+    background: transparent;
+    padding: 5px;
+    width: 30%;
+    display: flex;
+    justify-content: center;
+}
+.logout-btn {
+    width: 100%;
+    background-color: rgb(128, 0, 64);
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+}
+.logout-btn:hover {
+    background-color: rgb(165, 0, 95);
+}

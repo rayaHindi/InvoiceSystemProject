@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Track Invoice</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <style>
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 10px; border: 1px solid #ddd; text-align: center; }
+        th { background-color: #f4f4f4; }
+        .valid { background-color: #e6ffe6; } /* Green for valid */
+        .invalid { background-color: #ffe6e6; } /* Red for invalid */
+        .pagination { margin-top: 10px; text-align: center; }
+        .pagination a { margin: 0 5px; text-decoration: none; padding: 5px 10px; border: 1px solid #ccc; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Tracking Invoice #<span th:text="${invoice.id}"></span></h2>
+        <h3>Total Amount: <span th:text="${invoice.total} + ' $'"></span></h3>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Action</th>
+                    <th>Item</th>
+                    <th>Prev Price</th>
+                    <th>Prev Qty</th>
+                    <th>Curr Price</th>
+                    <th>Curr Qty</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="history : ${historyPage.content}" 
+                    th:classappend="${history.status} ? 'valid' : 'invalid'">
+                    <td th:text="${history.action}"></td>
+                    <td th:text="${history.invoiceItem != null ? history.invoiceItem.item.name : 'N/A'}"></td>
+                    <td th:text="${history.prevPrice != null ? history.prevPrice + ' $' : 'N/A'}"></td>
+                    <td th:text="${history.prevQuantity != null ? history.prevQuantity : 'N/A'}"></td>
+                    <td th:text="${history.currPrice != null ? history.currPrice + ' $' : 'N/A'}"></td>
+                    <td th:text="${history.currQuantity != null ? history.currQuantity : 'N/A'}"></td>
+                    <td th:text="${history.status} ? 'Valid' : 'Invalid'"></td>
+                    <td th:text="${#temporals.format(history.createdAt, 'yyyy-MM-dd HH:mm')}"></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Pagination Controls -->
+        <div class="pagination">
+            <a th:if="${historyPage.hasPrevious()}" th:href="@{/invoices/{id}/track(id=${invoice.id}, page=${historyPage.number - 1})}">Previous</a>
+            <span>Page <span th:text="${historyPage.number + 1}"></span> of <span th:text="${historyPage.totalPages}"></span></span>
+            <a th:if="${historyPage.hasNext()}" th:href="@{/invoices/{id}/track(id=${invoice.id}, page=${historyPage.number + 1})}">Next</a>
+        </div>
+    </div>
+</body>
+</html>

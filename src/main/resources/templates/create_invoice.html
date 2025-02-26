@@ -2,7 +2,18 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Create Invoice</title>
+
     <link rel="stylesheet" th:href="@{/css/invoicesTable.css}">
+	<style>
+			button {
+			    background-color: rgb(128, 0, 64);
+			    color: white;
+			    padding: 5px;
+			    width: 80px;
+			    border: none;
+			    cursor: pointer;
+			}
+		</style>
     <script>
         function addItem() {
             const itemSelect = document.getElementById("itemSelect");

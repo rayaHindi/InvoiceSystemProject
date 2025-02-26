@@ -33,8 +33,19 @@ public class InvoiceItem {
 	@Column(nullable = false, precision = 10, scale = 2)
 	private BigDecimal price;  
 
+	 @Column(name = "deleted", nullable = false)
+	 private boolean deleted = false;
 	
 	public InvoiceItem() {}
+	
+	public InvoiceItem(Item item, Invoice invoice, int quantity, BigDecimal price) {
+		super();
+		this.item = item;
+		this.invoice = invoice;
+		this.quantity = quantity;
+		this.price = price;
+	}
+
 	public InvoiceItem(Long id, Item item, Invoice invoice, int quantity,BigDecimal price) {
 		super();
 		this.id = id;
@@ -43,6 +54,16 @@ public class InvoiceItem {
 		this.quantity = quantity;
 		this.price = price;
 	}
+	
+	
+	public boolean isDeleted() {
+		return deleted;
+	}
+
+	public void setDeleted(boolean deleted) {
+		this.deleted = deleted;
+	}
+
 	public BigDecimal getPrice() {
 		return price;
 	}

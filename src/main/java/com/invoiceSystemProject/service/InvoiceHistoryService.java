@@ -46,6 +46,16 @@ public class InvoiceHistoryService {
 		
 		
 	}
+	public void logInvoiceDeletion(Invoice invoice) {
+		
+		 InvoiceHistory history = 
+				 new InvoiceHistory(invoice, null, "Deleted",
+				 					null, null, null, null, 
+				 						true);
+		 historyRepo.save(history);
+		
+		
+	}
 
 	public void logItemAdded(Invoice invoice, InvoiceItem invoiceItem) {
 		 InvoiceHistory history = 
@@ -72,12 +82,13 @@ public class InvoiceHistoryService {
 		historyRepo.invalidatePreviousEntry(invoice.getId(),itemToDelete.getId() );
 
 		 InvoiceHistory history = 
-				 new InvoiceHistory(invoice, itemToDelete, "Deleted",
+				 new InvoiceHistory(invoice, itemToDelete, "Item Deleted",
 						 itemToDelete.getPrice(), itemToDelete.getQuantity(), null, null,
 				 						true);
 		 historyRepo.save(history);
 		
 	}
+	
 	
 	
 }

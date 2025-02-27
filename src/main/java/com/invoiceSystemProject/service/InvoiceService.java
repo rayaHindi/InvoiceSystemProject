@@ -40,12 +40,16 @@ public class InvoiceService {
 	    }
 	 // return items for a certain invoice
 	 public List<InvoiceItem> getInvoiceItems(Long invoiceId){
-		 return invoiceItemRepo.findByInvoiceId(invoiceId);
+		 return invoiceItemRepo.findByInvoiceIdAndDeletedFalse(invoiceId);
 	 }
 	 //for auditor
 	 public Page<Invoice> getAllInvoices(int page) {
 	        Pageable pageable = PageRequest.of(page, 10, Sort.by("createdAt").descending());
-	        return invoiceRepo.findAll(pageable);
+	        return invoiceRepo.findByDeletedFalse(pageable);
+	    }
+	 public Page<Invoice> getDeletedInvoices(int page) {
+	        Pageable pageable = PageRequest.of(page, 10, Sort.by("createdAt").descending());
+	        return invoiceRepo.findByDeletedTrue(pageable);
 	    }
 
 
@@ -83,22 +87,38 @@ public class InvoiceService {
             }
         }
 	}
+	
 	public void softDelete(Long invoiceID) {
-		Invoice invoice = invoiceRepo.findById(invoiceID).orElse(null);
-		if (invoice != null) { // Check if invoice exists
-	        invoice.setDeleted(true);
-	        invoiceRepo.save(invoice);
-	    } else {
+	    Invoice invoice = invoiceRepo.findById(invoiceID).orElse(null);
+	    
+	    if (invoice == null) {
 	        throw new RuntimeException("Invoice not found with ID: " + invoiceID);
 	    }
+
+	    // Mark invoice as deleted
+	    invoice.setDeleted(true);
+	    invoice.setTotal(BigDecimal.ZERO); // Since all items will be deleted
+	    invoiceRepo.save(invoice);
+
+	    // Fetch associated items
+	    List<InvoiceItem> items = invoiceItemRepo.findByInvoiceIdAndDeletedFalse(invoiceID);
+	    
+	    for (InvoiceItem item : items) {
+	        invoiceItemService.softDelete(item.getId()); // Soft delete each item
+	        invoiceHistoryService.logItemRemoved(invoice, item); // Log deletion of item
+	    }
+
+	    // Log the invoice deletion event
+	    invoiceHistoryService.logInvoiceDeletion(invoice);
 	}
+
 	public Invoice getInvoiceById(Long id) {
 		return invoiceRepo.findById(id).orElse(null);
 	}
 	
 	public void editInvoice(Long id, List<Long> itemIds, List<Integer> quantities, List<BigDecimal> prices, List<Long> deletedItemIds) {
 		Invoice invoice = invoiceRepo.findById(id).orElse(null);
-		List<InvoiceItem> invoiceExistingItems= invoiceItemRepo.findByInvoiceId(id);
+		List<InvoiceItem> invoiceExistingItems= invoiceItemRepo.findByInvoiceIdAndDeletedFalse(id);
 		HashMap <Long, InvoiceItem>beforeEditingItemsMap= new HashMap <Long, InvoiceItem>();
 		
 		for(InvoiceItem invoiceItem : invoiceExistingItems ) {
@@ -115,15 +135,23 @@ public class InvoiceService {
 			//// item already exists in the invoice, -> UPDATE
 			if(beforeEditingItemsMap.containsKey(currentItemID)) {
 				InvoiceItem invoiceItem = beforeEditingItemsMap.get(currentItemID);
-	            invoiceHistoryService.logItemUpdated(invoice, invoiceItem, price, quantity);// log the update
+				
+				 boolean priceChanged = price.compareTo(invoiceItem.getPrice()) != 0;
+				  boolean quantityChanged = !(quantity==invoiceItem.getQuantity());
+				
+				if(priceChanged || quantityChanged) {
+			          invoiceHistoryService.logItemUpdated(invoice, invoiceItem, price, quantity);// log the update
 
-				invoiceItem.setPrice(price); // updated price
-				invoiceItem.setQuantity(quantity); // updated price
-				invoiceItemRepo.save(invoiceItem); //save it
+						invoiceItem.setPrice(price); // updated price
+						invoiceItem.setQuantity(quantity); // updated price
+						invoiceItemRepo.save(invoiceItem); //save it
+				}
+	  
 
 			}
 			//// item doesn't' exist in the invoice, -> ADD
 			else {
+				
 				Item item = itemRepo.findById(currentItemID).orElse(null);
 				InvoiceItem newInvoiceItem = new InvoiceItem( item, invoice, quantity, price);
                 invoiceItemRepo.save(newInvoiceItem);

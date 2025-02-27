@@ -1,110 +1,30 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>User Invoices</title>
+    <title>Invoices</title>
     <link rel="stylesheet" th:href="@{/css/styles.css}">
     <link rel="stylesheet" th:href="@{/css/invoicesTable.css}">
-    <style>
-		/* Ensure all table cells have the same height */
-		td {
-		    height: 100%; /* Ensure uniform height */
-		    vertical-align: middle; /* Align content vertically */
-		    padding: 10px; /* Add padding for consistency */
-		}
-
-		/* Adjust the Actions column */
-		.action-buttons {
-		    display: flex;
-		    justify-content: center;
-		    gap: 5px;
-		    align-items: center; /* Align buttons to the center */
-		    height: 100%; /* Ensure it does not shrink */
-		}
-
-		/* Ensure buttons take equal space and do not stretch row */
-		.action-buttons a, .action-buttons button {
-		    flex: 1;
-		    padding: 8px 12px;
-		    border: none;
-		    cursor: pointer;
-		    font-weight: bold;
-		    border-radius: 5px;
-		    text-decoration: none;
-		    text-align: center;
-		    color: white;
-		    height: 35px; /* Set a fixed height to match the row */
-		    display: flex;
-		    align-items: center;
-		    justify-content: center;
-		}
-
-		/* Button Colors */
-		.edit-btn {
-		    background-color: rgb(0, 128, 255);
-		}
-
-		.track-btn {
-		    background-color: rgb(255, 165, 0);
-		}
-
-		.delete-btn {
-		    background-color: rgb(255, 0, 0);
-		}
-
-		/* Button Hover Effects */
-		.edit-btn:hover {
-		    background-color: rgb(0, 100, 200);
-		}
-
-		.track-btn:hover {
-		    background-color: rgb(200, 140, 0);
-		}
-
-		.delete-btn:hover {
-		    background-color: rgb(200, 0, 0);
-		}
-		.formButton{
-			width: 50%;
-			background:transparent;
-			box-shadow: none;	
-			padding-left: 0;
-			padding-right: 0;
-			height: 50px;
-		}
-		.mini-table {
-		    width: 100%;
-		    border-collapse: collapse;
-		}
-
-		.mini-table th, .mini-table td {
-		    border: 1px solid #ddd;
-		    padding: 5px;
-		    text-align: center;
-			color: rgb(128, 0, 64);
-		}
-
-		.mini-table th {
-		    background-color: #f4f4f4;
-		    font-weight: bold;
-		}
-
-
-    </style>
 </head>
 <body>
     <div class="dashboard-container">
-        <h2>Your Invoices</h2>
-        <p>List of invoices ordered by latest created date.</p>
-		<div style="margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;">
-		    <!-- Dashboard Button -->
-		    <a href="/user/dashboard" class="action-btn dashboard-btn">🏠 Dashboard</a>
-		    
-		    <!-- Create Invoice Button -->
-		    <a href="/invoices/create" class="action-btn create-invoice-btn">➕ Create Invoice</a>
-		</div>
+        <h2>Invoices</h2>
+        <p th:if="${role == 'USER'}">Your invoices</p>
+        <p th:if="${role == 'SUPERUSER'}">All invoices (Superuser)</p>
+        <p th:if="${role == 'AUDITOR'}">All invoices (Auditor - Read Only)</p>
 
+        <div style="margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;">
+            <!-- Dynamic Dashboard Button -->
+            <a th:if="${role != null}" 
+               th:href="${role == 'USER' ? '/user/dashboard' : (role == 'SUPERUSER' ? '/superuser/dashboard' : '/auditor/dashboard')}"
+               class="action-btn dashboard-btn">🏠 Dashboard</a>
 
+            <!-- Create Invoice Button (Only for USER and SUPERUSER) -->
+            <a th:if="${role == 'USER' or role == 'SUPERUSER'}" href="/invoices/create" class="action-btn create-invoice-btn">➕ Create Invoice</a>
+        </div>
+
+        <!-- ✅ Active Invoices Table -->
         <div class="table-container">
+            <h3>Active Invoices</h3>
             <table>
                 <thead>
                     <tr>
@@ -112,37 +32,42 @@
                         <th>Total Amount</th>
                         <th>Items</th>
                         <th>Created At</th>
-                        <th>Actions</th> <!-- New column for Edit, Track, Delete -->
+                        <th th:if="${role == 'SUPERUSER' or role == 'AUDITOR'}">User</th>
+                        <th >Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr th:each="invoice : ${invoices.content}">
                         <td th:text="${invoice.id}"></td>
                         <td th:text="${invoice.total} + ' $'"></td>
-						<td>
-						    <table class="mini-table">
-						        <thead>
-						            <tr>
-						                <th>Item Name</th>
-						                <th>Price</th>
-						                <th>Quantity</th>
-						            </tr>
-						        </thead>
-						        <tbody>
-						            <tr th:each="item : ${invoiceItemsMap[invoice.id]}">
-						                <td th:text="${item.item.name}"></td>
-						                <td th:text="${item.item.price} + ' $'"></td>
-						                <td th:text="${item.quantity}"></td>
-						            </tr>
-						        </tbody>
-						    </table>
-						</td>
-
+                        <td>
+                            <table class="mini-table">
+                                <thead>
+                                    <tr>
+                                        <th>Item Name</th>
+                                        <th>Price</th>
+                                        <th>Quantity</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="item : ${invoiceItemsMap[invoice.id]}">
+                                        <td th:text="${item.item.name}"></td>
+                                        <td th:text="${item.item.price} + ' $'"></td>
+                                        <td th:text="${item.quantity}"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </td>
                         <td th:text="${#temporals.format(invoice.createdAt, 'yyyy-MM-dd HH:mm')}"></td>
+                        <td th:if="${role == 'SUPERUSER' or role == 'AUDITOR'}" th:text="${invoice.user.username}"></td>
+
+                        <!-- Action Buttons (Hidden for Auditor) -->
                         <td class="action-buttons">
-                            <a th:href="@{/invoices/{id}/edit(id=${invoice.id})}" class="edit-btn">Edit</a>
+                            <a th:href="@{/invoices/{id}/edit(id=${invoice.id})}" class="edit-btn" th:if="${role == 'SUPERUSER' or role == 'USER'}">Edit</a>
                             <a th:href="@{/invoices/{id}/track(id=${invoice.id})}" class="track-btn">Track</a>
-                            <form th:action="@{/invoices/{id}/delete(id=${invoice.id})}" class="formButton" method="post" onsubmit="return confirm('Are you sure you want to delete this invoice?');">
+							
+                            <form th:action="@{/invoices/{id}/delete(id=${invoice.id})}" class="formButton" method="post" 
+                                  onsubmit="return confirm('Are you sure you want to delete this invoice?');" th:if="${role == 'SUPERUSER' or role == 'USER'}">
                                 <button type="submit" class="delete-btn">Delete</button>
                             </form>
                         </td>
@@ -151,11 +76,40 @@
             </table>
         </div>
 
+        <!-- 🛑 ✅ Deleted Invoices Table (Only for AUDITOR) -->
+        <div class="table-container" th:if="${role == 'AUDITOR' and deletedInvoices.totalElements > 0}">
+            <h3 style="color: red;">Deleted Invoices</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Invoice ID</th>
+                        <th>Total Amount</th>
+                        <th>Created At</th>
+                        <th>User</th>
+						<th>Actions</th>
+						
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="invoice : ${deletedInvoices.content}">
+                        <td th:text="${invoice.id}"></td>
+                        <td th:text="${invoice.total} + ' $'"></td>
+                        <td th:text="${#temporals.format(invoice.createdAt, 'yyyy-MM-dd HH:mm')}"></td>
+                        <td th:text="${invoice.user.username}"></td>
+						<td class="action-buttons">
+						                            <a th:href="@{/invoices/{id}/track(id=${invoice.id})}" class="track-btn">Track</a>
+						                           
+						                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
         <!-- Pagination Controls -->
         <div class="pagination">
-            <a th:if="${invoices.hasPrevious()}" th:href="@{user/invoices(page=${invoices.number - 1})}">Previous</a>
+            <a th:if="${invoices.hasPrevious()}" th:href="@{/invoices(page=${invoices.number - 1})}">Previous</a>
             <span>Page <span th:text="${invoices.totalPages == 0 ? 1 : invoices.number + 1}"></span> of <span th:text="${invoices.totalPages == 0 ? 1 : invoices.totalPages}"></span></span>
-            <a th:if="${invoices.hasNext()}" th:href="@{/invoices/user(page=${invoices.number + 1})}">Next</a>
+            <a th:if="${invoices.hasNext()}" th:href="@{/invoices(page=${invoices.number + 1})}">Next</a>
         </div>
     </div>
 </body>

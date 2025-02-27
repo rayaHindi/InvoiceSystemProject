@@ -13,4 +13,8 @@ import com.invoiceSystemProject.model.User;
 public interface InvoiceRepository extends JpaRepository<Invoice , Long>{
 	public Page<Invoice>findByUser_UsernameAndDeletedFalse(String username, Pageable pageable);
 	public Page<Invoice>findByDeletedFalse(Pageable pageable);
+	public Page<Invoice>findByDeletedTrue(Pageable pageable);
+
+	//public Page<Invoice>findAllDeletedFalse(Pageable pageable);
+
 }

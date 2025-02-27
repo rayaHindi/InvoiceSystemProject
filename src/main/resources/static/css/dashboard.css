@@ -1,0 +1,79 @@
+body {
+          font-family: Arial, sans-serif;
+          background-color: #f4f4f4;
+          text-align: center;
+          margin: 0;
+          padding: 0;
+      }
+      .dashboard-container {
+          width: 50%;
+          margin: 100px auto;
+          background: white;
+          padding: 30px;
+          border-radius: 10px;
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+          border-top: 5px solid rgb(165, 0, 95); /* Accent color */
+      }
+      h2 {
+          color: rgb(128, 0, 64);
+      }
+      p {
+          color: #444;
+          font-size: 16px;
+      }
+      .dashboard-buttons {
+          margin-top: 20px;
+          display: flex;
+          flex-direction: column; /* Stack buttons vertically */
+          align-items: center;
+          gap: 10px;
+          width: 100%;
+      }
+      .dashboard-buttons a, 
+      .dashboard-buttons form button {
+          display: block;
+          text-decoration: none;
+          padding: 12px 25px;
+          width: 80%; /* Consistent width */
+          color: white;
+          background-color: rgb(128, 0, 64); /* Primary color */
+          border-radius: 5px;
+          transition: 0.3s;
+          font-weight: bold;
+          border: 2px solid transparent;
+          font-size: 14px;
+          cursor: pointer;
+          text-align: center;
+          border: none;
+      }
+      .dashboard-buttons a:hover, 
+      .dashboard-buttons form button:hover {
+          background-color: rgb(165, 0, 95); /* Accent color */
+          border-color: rgb(128, 0, 64);
+      }
+
+      /* 🔥 Logout button styling (Fixed) */
+      .logout-container {
+		background-color: transparent;
+          width: 100%;
+          display: flex;
+          justify-content: center; /* Center align */
+          background: transparent; /* Ensure transparency */
+      }
+      .logout-form {
+
+		background: transparent; /* ✅ Ensure no white background */
+		padding: 5px;
+          width: 30%; /* Match width with other buttons */
+          display: flex;
+          justify-content: center;
+      }
+      .logout-btn {
+		border-radius: 5px;
+
+          width: 100%; /* Same width as other buttons */
+          background-color: rgb(128, 0, 64); /* Same color as other buttons */
+      }
+      .logout-btn:hover {
+          background-color: rgb(165, 0, 95);
+      }

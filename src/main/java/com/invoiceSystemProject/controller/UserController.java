@@ -1,5 +1,6 @@
 package com.invoiceSystemProject.controller;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,6 +13,7 @@ import com.invoiceSystemProject.service.InvoiceService;
 @Controller
 @RequestMapping("/user")
 public class UserController {
+	 @PreAuthorize("hasRole('USER')") 
     @GetMapping("/dashboard")
     public String showUserDashboard() {
         return "user_dashboard"; // Loads user_dashboard.html

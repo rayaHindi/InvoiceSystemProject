@@ -2,89 +2,96 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Edit Invoice</title>
-    <link rel="stylesheet" th:href="@{/css/styles.css}">
-    
-    <script>
-        let itemIndex = [[${invoiceItems.size()}]]; // Track the number of existing items
-        let deletedItems = []; // Store deleted item IDs
+    <link rel="stylesheet" th:href="@{/css/invoicesTable.css}">
+    <link rel="stylesheet" th:href="@{/css/createInvoice.css}">
 
-        function addItem() {
-            const itemSelect = document.getElementById("itemSelect");
-            const quantityInput = document.getElementById("quantityInput");
-            const priceInput = document.getElementById("priceInput");
-            const itemTable = document.getElementById("invoiceItemsTable").querySelector("tbody");
+	<script>
+	    let itemIndex = /*[[${invoiceItems.size()}]]*/ 0;
+	    let deletedItems = []; 
 
-            const itemId = itemSelect.value;
-            const itemName = itemSelect.options[itemSelect.selectedIndex].text;
-            const itemPrice = parseFloat(priceInput.value);
-            const quantity = parseInt(quantityInput.value);
+	    document.addEventListener("DOMContentLoaded", function() {
+	        // Automatically fill the price input when an item is selected
+	        document.getElementById("itemSelect").addEventListener("change", function() {
+	            const selectedOption = this.options[this.selectedIndex];
+	            const priceInput = document.getElementById("priceInput");
 
-            if (!itemId || itemPrice <= 0 || quantity <= 0) {
-                alert("Please select a valid item, enter a quantity, and set a price.");
-                return;
-            }
+	            if (selectedOption.value) {
+	                const priceText = selectedOption.textContent.split(" - ")[1]; // Extracts price from option text
+	                const price = parseFloat(priceText.replace(" $", "")); // Convert extracted price to number
+	                priceInput.value = price.toFixed(2); // Set default price
+	            }
+	        });
+	    });
 
-            const newRow = document.createElement("tr");
-            newRow.innerHTML = `
-                <td>
-                    <input type="hidden" name="itemIds" value="${itemId}">
-                    ${itemName}
-                </td>
-                <td>
-                    <input type="number" name="prices" value="${itemPrice.toFixed(2)}" step="0.01" min="0" onchange="updateTotal()">
-                </td>
-                <td>
-                    <input type="number" name="quantities" value="${quantity}" min="1" onchange="updateTotal()">
-                </td>
-                <td>
-                    <button type="button" onclick="removeItem(this, null)">Remove</button>
-                </td>
-            `;
+	    function addItem() {
+	        const itemSelect = document.getElementById("itemSelect");
+	        const quantityInput = document.getElementById("quantityInput");
+	        const priceInput = document.getElementById("priceInput");
+	        const itemTable = document.getElementById("invoiceItemsTable").querySelector("tbody");
 
-            itemTable.appendChild(newRow);
-            itemIndex++; 
-            quantityInput.value = "";
-            priceInput.value = "";
-            updateTotal();
-        }
+	        const itemId = itemSelect.value;
+	        const itemName = itemSelect.options[itemSelect.selectedIndex].text;
+	        const itemPrice = parseFloat(priceInput.value);
+	        const quantity = parseInt(quantityInput.value);
 
-        function removeItem(button, itemId) {
-            const row = button.closest("tr");
-            row.remove();
+	        if (!itemId || itemPrice <= 0 || quantity <= 0) {
+	            alert("Please select a valid item, enter a quantity, and set a price.");
+	            return;
+	        }
 
-            if (itemId) {
-                deletedItems.push(itemId);
-                document.getElementById("deletedItemsInput").value = deletedItems.join(",");
-            }
-            updateTotal();
-        }
+	        const newRow = document.createElement("tr");
+	        newRow.innerHTML = `
+	            <td>
+	                <input type="hidden" name="itemIds" value="${itemId}">
+	                ${itemName}
+	            </td>
+	            <td>
+	                <input type="number" name="prices" value="${itemPrice.toFixed(2)}" step="0.01" min="0" onchange="updateTotal()">
+	            </td>
+	            <td>
+	                <input type="number" name="quantities" value="${quantity}" min="1" onchange="updateTotal()">
+	            </td>
+	            <td>
+	                <button type="button" class="remove-btn" onclick="removeItem(this, null)">Remove</button>
+	            </td>
+	        `;
 
-        function updateTotal() {
-            let total = 0;
-            document.querySelectorAll("#invoiceItemsTable tbody tr").forEach(row => {
-                const price = parseFloat(row.querySelector("input[name='prices']").value) || 0;
-                const quantity = parseInt(row.querySelector("input[name='quantities']").value) || 0;
-                total += price * quantity;
-            });
-            document.getElementById("totalAmount").textContent = total.toFixed(2) + " $";
-        }
+	        itemTable.appendChild(newRow);
+	        itemIndex++; 
+	        quantityInput.value = "";
+	        priceInput.value = "";
+	        updateTotal();
+	    }
 
-        function submitForm() {
-            document.getElementById("editInvoiceForm").submit();
-        }
-    </script>
+	    function removeItem(button, itemId) {
+	        const row = button.closest("tr");
+	        row.remove();
 
-    <style>
-        .form-container { width: 80%; margin: auto; }
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th, td { padding: 10px; border: 1px solid #ddd; text-align: center; }
-        th { background-color: #f4f4f4; }
-        button { padding: 5px 10px; cursor: pointer; }
-        .total-amount { font-weight: bold; margin-top: 10px; }
-    </style>
+	        if (itemId) {
+	            deletedItems.push(itemId);
+	            document.getElementById("deletedItemsInput").value = deletedItems.join(",");
+	        }
+	        updateTotal();
+	    }
+
+	    function updateTotal() {
+	        let total = 0;
+	        document.querySelectorAll("#invoiceItemsTable tbody tr").forEach(row => {
+	            const price = parseFloat(row.querySelector("input[name='prices']").value) || 0;
+	            const quantity = parseInt(row.querySelector("input[name='quantities']").value) || 0;
+	            total += price * quantity;
+	        });
+	        document.getElementById("totalAmount").textContent = total.toFixed(2) + " $";
+	    }
+
+	    function submitForm() {
+	        document.getElementById("editInvoiceForm").submit();
+	    }
+	</script>
+
 </head>
 <body>
-    <div class="form-container">
+    <div class="edit-invoice-container">
         <h2>Edit Invoice</h2>
 
         <form id="editInvoiceForm" th:action="@{/invoices/{id}/edit(id=${invoice.id})}" method="post">
@@ -92,27 +99,29 @@
             <input type="hidden" id="deletedItemsInput" name="deletedItemIds" value="">
 
             <!-- Add New Item Section -->
-            <h3>Add Item</h3>
-            <label>Select Item:</label>
-            <select id="itemSelect">
-                <option value="" disabled selected>Choose an item</option>
-                <option th:each="item : ${items}" 
-                        th:value="${item.id}" 
-                        th:text="${item.name} + ' - ' + ${item.price} + ' $'">
-                </option>
-            </select>
+            <div class="add-item-card">
+                <h3>Add Item</h3>
+                <label>Select Item:</label>
+                <select id="itemSelect">
+                    <option value="" disabled selected>Choose an item</option>
+                    <option th:each="item : ${items}" 
+                            th:value="${item.id}" 
+                            th:text="${item.name} + ' - ' + ${item.price} + ' $'">
+                    </option>
+                </select>
 
-            <label>Price:</label>
-            <input type="number" id="priceInput" step="0.01" min="0">
+                <label>Price:</label>
+                <input type="number" id="priceInput" step="0.01" min="0">
 
-            <label>Quantity:</label>
-            <input type="number" id="quantityInput" min="1">
+                <label>Quantity:</label>
+                <input type="number" id="quantityInput" min="1">
 
-            <button type="button" onclick="addItem()">Add Item</button>
+                <button type="button" class="add-item-btn" onclick="addItem()">Add Item</button>
+            </div>
 
             <!-- Invoice Items Table -->
             <h3>Invoice Items</h3>
-            <table id="invoiceItemsTable">
+            <table id="invoiceItemsTable" class="invoice-items-table">
                 <thead>
                     <tr>
                         <th>Item</th>
@@ -134,17 +143,15 @@
                             <input type="number" name="quantities" th:value="${invoiceItem.quantity}" min="1" onchange="updateTotal()">
                         </td>
                         <td>
-                            <button type="button" th:attr="onclick='removeItem(this,' + ${invoiceItem.id} + ')'">Remove</button>
+                            <button type="button" class="remove-btn" th:attr="onclick='removeItem(this,' + ${invoiceItem.id} + ')'">Remove</button>
                         </td>
                     </tr>
                 </tbody>
             </table>
 
-            <!-- Total Amount -->
             <h3 class="total-amount">Total: <span id="totalAmount" th:text="${invoice.total} + ' $'"></span></h3>
 
-            <!-- Submit Button -->
-            <button type="button" onclick="submitForm()">Save Changes</button>
+            <button type="button" class="save-changes-btn" onclick="submitForm()">Save Changes</button>
         </form>
     </div>
 </body>

@@ -1,0 +1,123 @@
+/* Create, Edit & Track Invoice Page Styling */
+.create-invoice-container, .edit-invoice-container, .track-invoice-container {
+    width: 60%;
+    margin: 50px auto;
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    border-top: 5px solid rgb(165, 0, 95);
+    text-align: center;
+}
+
+.create-invoice-container h2, .edit-invoice-container h2, .track-invoice-container h2 {
+    color: rgb(128, 0, 64);
+    margin-bottom: 20px;
+}
+
+label {
+    font-weight: bold;
+    margin-right: 10px;
+    color: #333;
+}
+
+select, input[type='number'] {
+    padding: 8px;
+    margin: 10px 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 150px;
+    text-align: center;
+}
+
+/* Status Colors */
+.valid td {
+    background-color: #e6ffe6 !important; /* Light Green for valid */
+    color: #008000 !important; /* Dark Green text */
+}
+
+.invalid td {
+    background-color: #ffe6e6 !important; /* Light Red for invalid */
+    color: #b30000 !important; /* Dark Red text */
+}
+/* Deleted Rows */
+.deleted td {
+    background-color: #ffcccc !important; /* Light Red for deleted rows */
+    color: #b30000 !important; /* Dark Red text */
+    /*font-weight: bold;*/
+}
+
+/* Table Styling */
+.track-invoice-table {
+    width: 80%;
+    border-collapse: collapse;
+    margin: 15px auto;
+    border-radius: 8px;
+    overflow: hidden;
+    background: white;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+}
+
+.track-invoice-table th, .track-invoice-table td {
+    padding: 12px;
+    border: 1px solid #ddd;
+    text-align: center;
+    font-size: 14px;
+}
+
+
+.track-invoice-table th {
+    background-color: #f4f4f4;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+.invisible-btn {
+    visibility: hidden; /* Keeps the space but hides the button */
+}
+
+/* Pagination Controls */
+.pagination {
+    margin-top: 15px;
+    text-align: center;
+}
+
+.pagination a {
+    margin: 0 5px;
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: bold;
+    color: rgb(128, 0, 64);
+    background: #f4f4f4;
+}
+
+.pagination a:hover {
+    background: rgb(128, 0, 64);
+    color: white;
+}
+
+.pagination span {
+    font-weight: bold;
+    margin: 0 10px;
+    color: rgb(128, 0, 64);
+}
+.selected-items-container {
+    margin-top: 20px;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.selected-item {
+    background: #f8f8f8;
+    padding: 10px;
+    border-radius: 5px;
+    width: 60%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}

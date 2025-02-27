@@ -14,6 +14,7 @@ import com.invoiceSystemProject.service.InvoiceService;
 @RequestMapping("/superuser")
 @PreAuthorize("hasRole('SUPERUSER')")
 public class SuperUserController {
+	   @PreAuthorize("hasRole('SUPERUSER')") 
 	 @GetMapping("/dashboard")
 	    public String showAdminDashboard() {
 	        return "superuser_dashboard"; // Loads admin_dashboard.html

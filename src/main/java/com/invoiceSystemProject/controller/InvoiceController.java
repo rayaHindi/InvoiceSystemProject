@@ -22,26 +22,18 @@ import com.invoiceSystemProject.model.Invoice;
 import com.invoiceSystemProject.model.InvoiceHistory;
 import com.invoiceSystemProject.model.InvoiceItem;
 import com.invoiceSystemProject.model.Item;
+import com.invoiceSystemProject.model.Role;
 import com.invoiceSystemProject.model.User;
 import com.invoiceSystemProject.service.InvoiceHistoryService;
 import com.invoiceSystemProject.service.InvoiceService;
 import com.invoiceSystemProject.service.ItemService;
 import com.invoiceSystemProject.service.UserService;
-/*
- * 
- * GET	/invoices/user	Get all invoices for the logged-in user
-GET	/invoices/all	Get all invoices (for SuperUser/Admin)
-POST	/invoices/create	Create a new invoice
-GET	/invoices/{id}	Get a specific invoice by ID
-PUT	/invoices/{id}/edit	Edit/update an existing invoice
-DELETE	/invoices/{id}/delete	Delete an invoice
- * */
+
 @Controller
-//@RequestMapping("/invoices")
+@RequestMapping("/invoices")
 public class InvoiceController {
 	 @Autowired
 	 	private InvoiceService invoiceService;
-	
 	 @Autowired
 	    private ItemService itemService;
 	 @Autowired
@@ -52,12 +44,26 @@ public class InvoiceController {
 	Logger logger= LoggerFactory.getLogger(InvoiceController.class);
 	
 		// user views their invoices//
-	   @PreAuthorize("hasRole('USER')") 
-	   @GetMapping("/user/invoices")
+	   @PreAuthorize("hasAnyRole('USER', 'SUPERUSER', 'AUDITOR')") 
+	   @GetMapping()
 	    public String getUserInvoices(@RequestParam(defaultValue = "0") int page, Principal principal, Model model) {
-		  logger.info("retrieving user's invoices");
-	        Page<Invoice> invoices = invoiceService.getInvoicesByUser(principal.getName(), page);
-	        model.addAttribute("invoices", invoices); // Pass to Thymeleaf
+		   	logger.info("retrieving user's invoices");
+		    User user = userService.getUserByName(principal.getName());
+		    String role = user.getRole().getRoleType(); //  "USER", "SUPERUSER", "AUDITOR"
+		    Page<Invoice> invoices;
+
+		    if ("SUPERUSER".equals(role) || "AUDITOR".equals(role)) {
+		        invoices = invoiceService.getAllInvoices(page); // Superuser & Auditor see all invoices
+		    } else {
+		        invoices = invoiceService.getInvoicesByUser(principal.getName(), page); //  only their invoices
+		    }	   
+		    if (role.equals("AUDITOR")) {
+		        Page<Invoice> deletedInvoices = invoiceService.getDeletedInvoices(page);
+		        model.addAttribute("deletedInvoices", deletedInvoices);
+		    }
+		    
+	        model.addAttribute("invoices", invoices); // passing to Thymeleaf
+	        model.addAttribute("role", role); // passing role to Thymeleaf
 	        
 	        HashMap  <Long,List<InvoiceItem>> map = new HashMap<Long, List<InvoiceItem>>();
 	        for (Invoice invoice : invoices.getContent()) {
@@ -65,19 +71,19 @@ public class InvoiceController {
 	        	map.put(invoice.getId(), items);
 	        }
 	        model.addAttribute("invoiceItemsMap", map); // Pass to Thymeleaf
-	        return "user_invoices"; // Returns Thymeleaf template for user invoices
+	        return "user_invoices"; // Thymeleaf template for user invoices
 	    }
 	  	
 	   // user + superUser creating invoice //
 	   @PreAuthorize("hasAnyRole('USER', 'SUPERUSER')")
-	   @GetMapping("/invoices/create")
+	   @GetMapping("/create")
 	    public String showCreateInvoiceForm(Model model) {
 	        List<Item> items = itemService.getAllItems(); // Fetch items
 	        model.addAttribute("items", items);
 	        return "create_invoice"; // Render the form
 	    }
 		@PreAuthorize("hasAnyRole('USER', 'SUPERUSER')")
-		@PostMapping("/invoices/create")
+		@PostMapping("/create")
 		public String  createInvoice(
 					@RequestParam("itemIds") List<Long> itemIds,  // Multiple item IDs
 			        @RequestParam("quantities") List<Integer> quantities, // Quantities matching item IDs
@@ -89,13 +95,13 @@ public class InvoiceController {
 		            logger.error("User not found");
 		        }
 				invoiceService.createInvoice(user, itemIds, quantities);
-		        return "redirect:/user/invoices";
+		        return "redirect:/invoices";
 		}
 		
 
 		// user + superUser editing an invoice //
-		@PreAuthorize("hasRole('USER')")
-		@GetMapping("/invoices/{id}/edit")
+		@PreAuthorize("hasAnyRole('USER', 'SUPERUSER')")
+		@GetMapping("/{id}/edit")
 		public String showEditInvoiceForm(@PathVariable Long id, Model model) {
 		    Invoice invoice = invoiceService.getInvoiceById(id);
 		    if (invoice == null) {
@@ -111,8 +117,8 @@ public class InvoiceController {
 		    
 		    return "edit_invoice"; // Returns the Thymeleaf template
 		}
-		@PreAuthorize("hasRole('USER')")
-		@PostMapping("/invoices/{id}/edit")
+		@PreAuthorize("hasAnyRole('USER', 'SUPERUSER')")
+		@PostMapping("/{id}/edit")
 		public String editInvoice(
 		        @PathVariable Long id,
 		        @RequestParam("itemIds") List<Long> itemIds,
@@ -123,24 +129,35 @@ public class InvoiceController {
 		        Principal principal) {
 
 		    User user = userService.getUserByName(principal.getName());
+		    Invoice invoice = invoiceService.getInvoiceById(id);
+		    String role =user.getRole().getRoleType();
 		    if (user == null) {
 		        throw new RuntimeException("User not found!");
 		    }
+		    if (invoice == null) {
+		        throw new RuntimeException("Invoice not found!");
+		    }
+
+		    // Authorization Check: If the user is a regular USER, they can only edit their own invoices
+		    if (role.equals("USER") && !(invoice.getUser().getUsername().equals(user.getUsername()) ) ) {
+		        throw new RuntimeException("You are not authorized to edit this invoice.");
+		    }
+
 
 		    invoiceService.editInvoice(id, itemIds, quantities, prices, deletedItemIds);
-		    return "redirect:/user/invoices";
+		    return "redirect:/invoices";
 		}
 		
 		// user + superUser deleting an invoice //
-		@PreAuthorize("hasAnyRole('USER,SUPERUSER')")
-		@PostMapping("/invoices/{id}/delete")
+		@PreAuthorize("hasAnyRole('USER', 'SUPERUSER')")
+		@PostMapping("/{id}/delete")
 		public String deleteInvoice(@PathVariable Long id) {
 			invoiceService.softDelete(id);
-			return "redirect:/user/invoices";
+			return "redirect:/invoices";
 		}
 		
-		@PreAuthorize("hasAnyRole('USER', 'SUPERUSER')")
-		@GetMapping("/invoices/{id}/track")
+		@PreAuthorize("hasAnyRole('USER', 'SUPERUSER','AUDITOR')")
+		@GetMapping("/{id}/track")
 		public String trackInvoice(@PathVariable Long id, 
 		                           @RequestParam(defaultValue = "0") int page, 
 		                           Model model) {
@@ -148,6 +165,7 @@ public class InvoiceController {
 		    if (invoice == null) {
 		        throw new RuntimeException("Invoice not found!");
 		    }
+		    
 
 		    // Fetch the invoice history with pagination
 		    Page<InvoiceHistory> historyPage = invoiceHistoryService.getInvoiceHistory(id, page);
@@ -158,6 +176,43 @@ public class InvoiceController {
 		    
 		    return "track_invoice"; // Thymeleaf template to display history
 		}
+		
+		//search ///
+		@PreAuthorize("hasAnyRole('USER', 'SUPERUSER', 'AUDITOR')")
+		@GetMapping("/search")
+		public String searchInvoice(@RequestParam(name = "invoiceId", required = false) Long invoiceId,
+		                            Principal principal,
+		                            Model model) {
+		    if (invoiceId == null) {
+		        return "search_invoice"; // Return the search page if no query is provided
+		    }
+
+		    User user = userService.getUserByName(principal.getName());
+		    if (user == null) {
+		        throw new RuntimeException("User not found!");
+		    }
+		    String role= user.getRole().getRoleType();
+
+		    Invoice invoice = invoiceService.getInvoiceById(invoiceId);
+		    if (invoice == null || invoice.isDeleted()) {
+		        model.addAttribute("error", "Invoice not found!");
+		        return "search_invoice";
+		    }
+
+		    // Authorization Check
+		    if (role.equals("USER") && !invoice.getUser().getUsername().equals(user.getUsername())) {
+		        model.addAttribute("error", "You are not authorized to view this invoice.");
+		        return "search_invoice";
+		    }
+
+		    List<InvoiceItem> invoiceItems = invoiceService.getInvoiceItems(invoiceId);
+		    model.addAttribute("invoice", invoice);
+		    model.addAttribute("invoiceItems", invoiceItems);
+		    model.addAttribute("role", role);
+
+		    return "search_invoice";
+		}
+
 
 	
 

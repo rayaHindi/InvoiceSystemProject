@@ -15,7 +15,7 @@ body {
     padding: 30px;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    border-top: 5px solid rgb(165, 0, 95); /* Accent color */
+    border-top: 5px solid rgb(165, 0, 95);
 }
 
 /* Titles and Text */
@@ -96,4 +96,95 @@ th {
 }
 .logout-btn:hover {
     background-color: rgb(165, 0, 95);
+}
+
+button {
+    background-color: rgb(128, 0, 64);
+    color: white;
+    padding: 5px;
+    width: 80px;
+    border: none;
+    cursor: pointer;
+}
+button:hover {
+    background-color: rgb(165, 0, 95);
+}
+
+/* Invoice Table Adjustments */
+td {
+    height: 100%;
+    vertical-align: middle;
+    padding: 10px;
+}
+
+.action-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+    align-items: center;
+    height: 100%;
+}
+
+.action-buttons a, .action-buttons button {
+    flex: 1;
+    padding: 8px 12px;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    border-radius: 5px;
+    text-decoration: none;
+    text-align: center;
+    color: white;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Button Colors */
+.edit-btn {
+    background-color: rgb(0, 128, 255);
+}
+.track-btn {
+    background-color: rgb(255, 165, 0);
+}
+.delete-btn {
+    background-color: rgb(255, 0, 0);
+}
+
+/* Button Hover Effects */
+.edit-btn:hover {
+    background-color: rgb(0, 100, 200);
+}
+.track-btn:hover {
+    background-color: rgb(200, 140, 0);
+}
+.delete-btn:hover {
+    background-color: rgb(200, 0, 0);
+}
+
+.formButton {
+    width: 50%;
+    background: transparent;
+    box-shadow: none;
+    padding-left: 0;
+    padding-right: 0;
+    height: 50px;
+}
+
+.mini-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.mini-table th, .mini-table td {
+    border: 1px solid #ddd;
+    padding: 5px;
+    text-align: center;
+    color: rgb(128, 0, 64);
+}
+
+.mini-table th {
+    background-color: #f4f4f4;
+    font-weight: bold;
 }

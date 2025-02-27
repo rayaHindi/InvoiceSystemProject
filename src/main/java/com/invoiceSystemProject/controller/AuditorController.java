@@ -14,6 +14,7 @@ import com.invoiceSystemProject.service.InvoiceService;
 @RequestMapping("/auditor")
 @PreAuthorize("hasRole('AUDITOR')")
 public class AuditorController {
+	   @PreAuthorize("hasRole('AUDITOR')") 
 	 @GetMapping("/dashboard")
 	    public String showAdminDashboard() {
 	        return "auditor_dashboard"; // Loads admin_dashboard.html

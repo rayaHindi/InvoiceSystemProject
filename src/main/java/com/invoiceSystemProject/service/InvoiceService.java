@@ -18,6 +18,8 @@ import com.invoiceSystemProject.repository.InvoiceItemRepository;
 import com.invoiceSystemProject.repository.InvoiceRepository;
 import com.invoiceSystemProject.repository.ItemRepository;
 
+import jakarta.persistence.EntityNotFoundException;
+
 import org.springframework.data.domain.Pageable;
 
 @Service
@@ -33,6 +35,7 @@ public class InvoiceService {
 	private InvoiceHistoryService invoiceHistoryService;
 	@Autowired
 	private InvoiceItemService invoiceItemService;
+
 
 	 public Page<Invoice> getInvoicesByUser(String username, int page) {
 	        Pageable pageable = PageRequest.of(page, 10, Sort.by("createdAt").descending());
@@ -97,7 +100,7 @@ public class InvoiceService {
 
 	    // Mark invoice as deleted
 	    invoice.setDeleted(true);
-	    invoice.setTotal(BigDecimal.ZERO); // Since all items will be deleted
+	    invoice.setTotal(BigDecimal.ZERO); //  all items will be deleted
 	    invoiceRepo.save(invoice);
 
 	    // Fetch associated items
@@ -117,7 +120,7 @@ public class InvoiceService {
 	}
 	
 	public void editInvoice(Long id, List<Long> itemIds, List<Integer> quantities, List<BigDecimal> prices, List<Long> deletedItemIds) {
-		Invoice invoice = invoiceRepo.findById(id).orElse(null);
+		Invoice invoice = invoiceRepo.findById(id).orElseThrow(()->new EntityNotFoundException("Invoice not found"));
 		List<InvoiceItem> invoiceExistingItems= invoiceItemRepo.findByInvoiceIdAndDeletedFalse(id);
 		HashMap <Long, InvoiceItem>beforeEditingItemsMap= new HashMap <Long, InvoiceItem>();
 		
@@ -178,4 +181,5 @@ public class InvoiceService {
 		invoice.setTotal(newTotal);
 	    invoiceRepo.save(invoice);
 	}
+
 }

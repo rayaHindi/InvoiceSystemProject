@@ -9,6 +9,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.filter.HiddenHttpMethodFilter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -24,6 +25,7 @@ public class SecurityConfig {
 		.authorizeHttpRequests(
 				auth->auth
 				.requestMatchers("/auth/*").permitAll() // ✅ Allow login & signup
+	            .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll() // ✅ Allow Swagger
 	            .requestMatchers("/css/**", "/js/**", "/images/**").permitAll() // ✅ Allow static files
 				.anyRequest().authenticated()
 				)
@@ -44,5 +46,9 @@ public class SecurityConfig {
 	   @Bean
 	    public AuthenticationConfiguration authenticationConfiguration() {
 	        return new AuthenticationConfiguration();
+	    }
+	   @Bean
+	    public HiddenHttpMethodFilter hiddenHttpMethodFilter() {
+	        return new HiddenHttpMethodFilter();
 	    }
 }

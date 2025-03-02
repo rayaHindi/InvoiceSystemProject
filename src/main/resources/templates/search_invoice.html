@@ -116,9 +116,9 @@
                     </tr>
                 </tbody>
             </table>
-
+<br>
             <!-- Actions -->
-            <div class="action-buttons" th:if="${role != 'AUDITOR'}">
+            <div class="action-buttons" >
                 <a th:href="@{/invoices/{id}/edit(id=${invoice.id})}" class="edit-btn" th:if="${role == 'SUPERUSER' or role == 'USER'}">Edit</a>
                 <a th:href="@{/invoices/{id}/track(id=${invoice.id})}" class="track-btn">Track</a>
                 <form th:action="@{/invoices/{id}/delete(id=${invoice.id})}" class="formButton" method="post" 

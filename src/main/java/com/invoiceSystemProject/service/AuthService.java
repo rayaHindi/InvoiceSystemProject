@@ -15,6 +15,9 @@ import com.invoiceSystemProject.model.User;
 import com.invoiceSystemProject.repository.RoleRepository;
 import com.invoiceSystemProject.repository.UserRepository;
 import com.invoiceSystemProject.security.JwtUtil;
+
+import jakarta.persistence.EntityNotFoundException;
+
 import com.invoiceSystemProject.model.Role;
 
 @Service
@@ -45,7 +48,7 @@ public class AuthService {
 	
 	public String signUpUser(User user, Long roleType) {
 		
-		 Role role = roleRepo.findById(roleType).orElseThrow(() -> new RuntimeException("Role not found"));
+		 Role role = roleRepo.findById(roleType).orElseThrow(() -> new EntityNotFoundException("Role not found"));
 		 user.setRole(role);
 		 user.setPassword(passwordEncoder.encode(user.getPassword())); // Hash password
 		 userRepo.save(user);   

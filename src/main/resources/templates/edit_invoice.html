@@ -94,7 +94,8 @@
     <div class="edit-invoice-container">
         <h2>Edit Invoice</h2>
 
-        <form id="editInvoiceForm" th:action="@{/invoices/{id}/edit(id=${invoice.id})}" method="post">
+		<form id="editInvoiceForm" th:action="@{/invoices/{id}/edit(id=${invoice.id})}" method="post">
+		    <input type="hidden" name="_method" value="PUT">
             <input type="hidden" name="id" th:value="${invoice.id}">
             <input type="hidden" id="deletedItemsInput" name="deletedItemIds" value="">
 

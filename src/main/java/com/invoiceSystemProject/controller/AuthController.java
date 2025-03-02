@@ -50,7 +50,9 @@ public class AuthController {
 	    logger.info("Login attempt for user: {}", username);
 
 	    try {
+	    	
 	        String token = authService.loginUser(username, password);
+	        logger.info(" User logged in successfully: {}", username); 
 
 	        // Store JWT in HTTP-only cookie
 	        Cookie jwtCookie = new Cookie("JWT_TOKEN", token);
@@ -81,7 +83,7 @@ public class AuthController {
 	
 	 @GetMapping("/signup")
 	    public String signupForm(Model model) {
-	        model.addAttribute("user", new User()); // Bind empty user object to form
+	        model.addAttribute("user", new User()); // binding empty user object to form
 	        List<Role> roles = roleRepo.findAll(); // Fetch roles from db
 	        model.addAttribute("roles", roles); 
 	        return "signup";

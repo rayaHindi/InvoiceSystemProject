@@ -5,6 +5,9 @@
     <link rel="stylesheet" th:href="@{/css/styles.css}">
     <link rel="stylesheet" th:href="@{/css/invoicesTable.css}">
 </head>
+<style>
+	
+</style>
 <body>
     <div class="dashboard-container">
         <h2>Invoices</h2>
@@ -80,6 +83,15 @@
                 </tbody>
             </table>
         </div>
+		<div class="pagination">
+		    <a th:if="${invoices.hasPrevious()}" 
+		       th:href="@{/invoices(page1=${invoices.number - 1}, page2=${deletedInvoices != null ? deletedInvoices.number : 0})}">Previous</a>
+		    <span>Page <span th:text="${invoices.totalPages == 0 ? 1 : invoices.number + 1}"></span> 
+		    of <span th:text="${invoices.totalPages == 0 ? 1 : invoices.totalPages}"></span></span>
+		    <a th:if="${invoices.hasNext()}" 
+		       th:href="@{/invoices(page1=${invoices.number + 1}, page2=${deletedInvoices != null ? deletedInvoices.number : 0})}">Next</a>
+		</div>
+
 
         <!-- 🛑 ✅ Deleted Invoices Table (Only for AUDITOR) -->
         <div class="table-container" th:if="${role == 'AUDITOR' and deletedInvoices.totalElements > 0}">
@@ -110,12 +122,16 @@
             </table>
         </div>
 
-        <!-- Pagination Controls -->
-        <div class="pagination">
-            <a th:if="${invoices.hasPrevious()}" th:href="@{/invoices(page=${invoices.number - 1})}">Previous</a>
-            <span>Page <span th:text="${invoices.totalPages == 0 ? 1 : invoices.number + 1}"></span> of <span th:text="${invoices.totalPages == 0 ? 1 : invoices.totalPages}"></span></span>
-            <a th:if="${invoices.hasNext()}" th:href="@{/invoices(page=${invoices.number + 1})}">Next</a>
-        </div>
+		<!-- ✅ Pagination for Deleted Invoices (Only for Auditors) -->
+		<div class="pagination" th:if="${role == 'AUDITOR' and deletedInvoices.totalElements > 0}">
+		    <a th:if="${deletedInvoices.hasPrevious()}" 
+		       th:href="@{/invoices(page1=${invoices.number}, page2=${deletedInvoices.number - 1})}">Previous</a>
+		    <span>Page <span th:text="${deletedInvoices.totalPages == 0 ? 1 : deletedInvoices.number + 1}"></span> 
+		    of <span th:text="${deletedInvoices.totalPages == 0 ? 1 : deletedInvoices.totalPages}"></span></span>
+		    <a th:if="${deletedInvoices.hasNext()}" 
+		       th:href="@{/invoices(page1=${invoices.number}, page2=${deletedInvoices.number + 1})}">Next</a>
+		</div>
+
     </div>
 </body>
 </html>

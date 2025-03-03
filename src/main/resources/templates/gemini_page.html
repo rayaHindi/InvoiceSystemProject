@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Gemini SQL Query Generator</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <link rel="stylesheet" th:href="@{/css/invoicesTable.css}">
+</head>
+<style>
+    /* Ensure full scrollability */
+    html, body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        overflow-y: auto;
+        box-sizing: border-box;
+    }
+
+    /* Query results container */
+    .query-results-container {
+        max-height: 400px;
+        overflow-y: auto;
+        margin-top: 20px;
+        border: 1px solid #ddd;
+    }
+
+    /* Table styling */
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        overflow-x: auto;
+        display: block;
+    }
+
+    th {
+        position: sticky;
+        top: 0;
+        background: #8b008b;
+        color: white;
+        text-align: left;
+    }
+
+    td {
+        padding: 10px;
+        border: 1px solid #ddd;
+        white-space: nowrap;
+    }
+
+</style>
+<body>
+    <h2>Gemini AI SQL Generator</h2>
+
+    <!-- Navigation Buttons -->
+    <div style="margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;">
+        <a th:if="${role != null}" 
+           th:href="${role == 'USER' ? '/user/dashboard' : (role == 'SUPERUSER' ? '/superuser/dashboard' : '/auditor/dashboard')}"
+           class="action-btn dashboard-btn">🏠 Dashboard</a>
+    </div>
+
+    <!-- User Input Form -->
+    <form action="/invoices/gemini" method="post">
+        <label for="userPrompt">Enter your query requirement:</label><br>
+        <input type="text" id="userPrompt" name="userPrompt" size="50" required
+               th:value="${userPrompt != null ? userPrompt : ''}"><br><br>
+        <button type="submit">Generate SQL & Run</button>
+    </form>
+
+    <!-- Display Generated SQL -->
+    <h3>Generated SQL Query:</h3>
+    <p><strong th:if="${generatedSql != null}" th:text="${generatedSql}"></strong></p>
+
+    <!-- Error Handling -->
+    <h3 style="color: red;" th:if="${errorMessage}" th:text="${errorMessage}"></h3>
+
+    <!-- Query Results -->
+    <h3>Query Results:</h3>
+    <div class="query-results-container">
+        <table border="1" th:if="${queryResult != null}">
+            <tbody>
+                <tr th:each="row : ${queryResult}">
+                    <td th:each="col : ${row}" th:text="${col}"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

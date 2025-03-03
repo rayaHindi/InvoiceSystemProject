@@ -51,19 +51,23 @@ public class InvoiceController {
 		// user views their invoices//
 	   @PreAuthorize("hasAnyRole('USER', 'SUPERUSER', 'AUDITOR')") 
 	   @GetMapping()
-	    public String getUserInvoices(@RequestParam(defaultValue = "0") int page, Principal principal, Model model) {
+	    public String getUserInvoices(
+	    		@RequestParam(defaultValue = "0") int page1,
+	    		@RequestParam(defaultValue = "0") int page2,
+
+	    		Principal principal, Model model) {
 		   	logger.info("retrieving user's invoices");
 		    User user = userService.getUserByName(principal.getName());
 		    String role = user.getRole().getRoleType(); //  "USER", "SUPERUSER", "AUDITOR"
 		    Page<Invoice> invoices;
 
 		    if ("SUPERUSER".equals(role) || "AUDITOR".equals(role)) {
-		        invoices = invoiceService.getAllInvoices(page); // Superuser & Auditor see all invoices
+		        invoices = invoiceService.getAllInvoices(page1); // Superuser & Auditor see all invoices
 		    } else {
-		        invoices = invoiceService.getInvoicesByUser(principal.getName(), page); //  only their invoices
+		        invoices = invoiceService.getInvoicesByUser(principal.getName(), page1); //  only their invoices
 		    }	   
 		    if (role.equals("AUDITOR")) {
-		        Page<Invoice> deletedInvoices = invoiceService.getDeletedInvoices(page);
+		        Page<Invoice> deletedInvoices = invoiceService.getDeletedInvoices(page2);
 		        model.addAttribute("deletedInvoices", deletedInvoices);
 		    }
 		    

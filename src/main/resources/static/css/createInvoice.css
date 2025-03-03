@@ -47,6 +47,13 @@ select, input[type='number'] {
     /*font-weight: bold;*/
 }
 
+
+.invalid {
+    background-color: #ffeeba; /* Light yellow for invalid */
+    color: #a85; /* Darker yellow text */
+}
+
+
 /* Table Styling */
 .track-invoice-table {
     width: 80%;

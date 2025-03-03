@@ -1,22 +1,17 @@
 /* General Styles */
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
-    text-align: center;
-    margin: 0;
-    padding: 0;
+/* Ensure the body is scrollable */
+/* Allow body to expand naturally based on content */
+/* Ensure body expands naturally but allows scrolling */
+/* Ensure body expands naturally and allows scrolling */
+
+
+/* Fix potential hidden top issue */
+.dashboard-container::before {
+    content: "";
+    display: block;
+    height: 10px; /* Adds small space above to prevent content cutoff */
 }
 
-/* Dashboard Container */
-.dashboard-container {
-    width: 70%;
-    margin: 50px auto;
-    background: white;
-    padding: 30px;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    border-top: 5px solid rgb(165, 0, 95);
-}
 
 /* Titles and Text */
 h2 {
@@ -28,10 +23,7 @@ p {
 }
 
 /* Table Styling */
-.table-container {
-    width: 100%;
-    overflow-x: auto;
-}
+
 table {
     width: 100%;
     border-collapse: collapse;
@@ -187,4 +179,32 @@ td {
 .mini-table th {
     background-color: #f4f4f4;
     font-weight: bold;
+}
+
+/* Ensure the body is scrollable */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+}
+
+/* Adjust Dashboard Container */
+.dashboard-container {
+    width: 70%;
+    margin: 50px auto;
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    border-top: 5px solid rgb(165, 0, 95);
+    overflow-y: auto; /* Allow scrolling within the container */
+}
+
+/* Ensure the table container can scroll separately */
+.table-container {
+    width: 100%;
+    overflow-x: auto; /* Horizontal scrolling if needed */
+    overflow-y: auto; /* Enable vertical scrolling */
 }

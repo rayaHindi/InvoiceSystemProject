@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Execute SQL Query</title>
+	<link rel="stylesheet" th:href="@{/css/styles.css}">
+	  <link rel="stylesheet" th:href="@{/css/invoicesTable.css}">
+</head>
+<style>
+	/* Ensure the entire page is scrollable */
+	html, body {
+	    margin: 0;
+	    padding: 0;
+	    width: 100%;
+	    height: 100%;
+	    overflow-y: auto; /* Allows vertical scrolling */
+	    box-sizing: border-box;
+	}
+
+	/* Limit the height of the results table to prevent it from pushing content above */
+	.query-results-container {
+	    max-height: 400px; /* Adjust the height based on preference */
+	    overflow-y: auto; /* Enables scrolling within the table */
+	    margin-top: 20px;
+	    border: 1px solid #ddd;
+	}
+
+	/* Ensure table remains scrollable if it gets too large */
+	table {
+	    width: 100%;
+	    border-collapse: collapse;
+	    overflow-x: auto; /* Enables horizontal scrolling if needed */
+	    display: block; /* Ensures proper layout */
+	}
+
+	/* Table Header Styles */
+	th {
+	    position: sticky;
+	    top: 0;
+	    background: #8b008b;
+	    color: white;
+	    text-align: left;
+	}
+
+	/* Table Cell Styles */
+	td {
+	    padding: 10px;
+	    border: 1px solid #ddd;
+	    white-space: nowrap; /* Prevents content from wrapping too much */
+	}
+
+	</style>
+<body>
+    <h2>Execute SQL Query</h2>
+
+	<!-- Navigation Buttons -->
+	<div style="margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;">
+	    <!-- Dynamic Dashboard Button -->
+	    <a th:if="${role != null}" 
+	       th:href="${role == 'USER' ? '/user/dashboard' : (role == 'SUPERUSER' ? '/superuser/dashboard' : '/auditor/dashboard')}"
+	       class="action-btn dashboard-btn">🏠 Dashboard</a>
+</div>
+<form action="/invoices/executeQuery" method="get">
+    <label for="sql">Enter SQL Query:</label><br>
+    <input type="text" id="sql" name="sql" size="50" required 
+           th:value="${sql != null ? sql : ''}"><br><br>
+    <button type="submit">Run Query</button>
+</form>
+
+
+	<h3>Query Results:</h3>
+	<div class="query-results-container">
+	    <table border="1" th:if="${queryResult != null}">
+	        <tbody>
+	            <tr th:each="row : ${queryResult}">
+	                <td th:each="col : ${row}" th:text="${col}"></td>
+	            </tr>
+	        </tbody>
+	    </table>
+	</div>
+
+
+</body>
+</html>

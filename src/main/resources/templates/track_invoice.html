@@ -25,9 +25,11 @@
                 </tr>
             </thead>
 			<tbody>
-			    <tr th:each="history : ${historyPage.content}" 
-			        th:classappend="${history.action == 'Deleted' or history.action == 'Item Deleted' ? 'deleted' : (history.status ? 'valid' : 'invalid')}">
-			        
+			    <tr  th:each="history : ${historyPage.content}"
+				th:classappend="${invoice.deleted ? 'deleted' : 
+				                 (history.action == 'Deleted' or history.action == 'Item Deleted' ? 'deleted' : 
+				                 (history.status ? 'valid' : 'invalid'))}">
+				 			        
 			        <td th:text="${history.action}"></td>
 			        <td th:text="${history.invoiceItem != null ? history.invoiceItem.item.name : '---'}"></td>
 			        <td th:text="${history.prevPrice != null ? #numbers.formatDecimal(history.prevPrice, 1, 'COMMA', 2, 'POINT') + ' $' : '---'}"></td>

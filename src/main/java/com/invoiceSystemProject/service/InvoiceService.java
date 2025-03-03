@@ -100,7 +100,7 @@ public class InvoiceService {
 
 	    // Mark invoice as deleted
 	    invoice.setDeleted(true);
-	    invoice.setTotal(BigDecimal.ZERO); //  all items will be deleted
+	   // invoice.setTotal(BigDecimal.ZERO); //  all items will be deleted
 	    invoiceRepo.save(invoice);
 
 	    // Fetch associated items
